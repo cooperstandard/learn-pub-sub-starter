@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"os"
-	"os/signal"
+	// "os"
+	// "os/signal"
 
+	"github.com/bootdotdev/learn-pub-sub-starter/internal/gamelogic"
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/pubsub"
 	"github.com/bootdotdev/learn-pub-sub-starter/internal/routing"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -28,21 +29,44 @@ func main() {
 		log.Fatalf("failed to open channel")
 	}
 
-	body, err := json.Marshal(routing.PlayingState{
-		IsPaused: true,
-	})
-	if err != nil {
-		log.Fatalf("failed to marshal payload")
-	}
-	err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), body)
-	if err != nil {
-		log.Fatalf("failed to publish json")
-	}
-	fmt.Println("successfully sent json")
+	gamelogic.PrintServerHelp()
 
-	// wait for ctrl+c
-	signalChan := make(chan os.Signal, 1)
-	signal.Notify(signalChan, os.Interrupt)
-	<-signalChan
-	fmt.Println("signal received")
+	for {
+		input := gamelogic.GetInput()
+		if len(input) == 0 {
+			continue
+		}
+
+		if input[0] == "pause" {
+			body, err := json.Marshal(routing.PlayingState{
+				IsPaused: true,
+			})
+			if err != nil {
+				log.Fatalf("failed to marshal payload")
+			}
+			err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), body)
+			if err != nil {
+				log.Fatalf("failed to publish json")
+			}
+			fmt.Println("successfully sent pause")
+		} else if input[0] == "resume" {
+
+			body, err := json.Marshal(routing.PlayingState{
+				IsPaused: false,
+			})
+			if err != nil {
+				log.Fatalf("failed to marshal payload")
+			}
+			err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), body)
+			if err != nil {
+				log.Fatalf("failed to publish json")
+			}
+			fmt.Println("successfully sent resume")
+		} else if input[0] == "quit" {
+			fmt.Println("exiting...")
+			break
+		} else {
+			fmt.Println(input[0] + " is not a valid command")
+		}
+	}
 }
