@@ -1,9 +1,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
+
 	// "os"
 	// "os/signal"
 
@@ -28,6 +28,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to open channel")
 	}
+	_, _, err = pubsub.DeclareAndBind(connection, "peril_topic", "game_logs", routing.GameLogSlug, 0)
+	if err != nil {
+		log.Fatalf("failed to create log queue")
+	}
 
 	gamelogic.PrintServerHelp()
 
@@ -38,26 +42,18 @@ func main() {
 		}
 
 		if input[0] == "pause" {
-			body, err := json.Marshal(routing.PlayingState{
+			err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), routing.PlayingState{
 				IsPaused: true,
 			})
-			if err != nil {
-				log.Fatalf("failed to marshal payload")
-			}
-			err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), body)
 			if err != nil {
 				log.Fatalf("failed to publish json")
 			}
 			fmt.Println("successfully sent pause")
 		} else if input[0] == "resume" {
 
-			body, err := json.Marshal(routing.PlayingState{
+			err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), routing.PlayingState{
 				IsPaused: false,
 			})
-			if err != nil {
-				log.Fatalf("failed to marshal payload")
-			}
-			err = pubsub.PublishJSON(ch, routing.ExchangePerilDirect, string(routing.PauseKey), body)
 			if err != nil {
 				log.Fatalf("failed to publish json")
 			}
