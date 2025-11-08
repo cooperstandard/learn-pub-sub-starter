@@ -30,6 +30,7 @@ func main() {
 	}
 	_, _, err = pubsub.DeclareAndBind(connection, "peril_topic", "game_logs", routing.GameLogSlug, 0)
 	if err != nil {
+		log.Println(err)
 		log.Fatalf("failed to create log queue")
 	}
 

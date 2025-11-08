@@ -18,11 +18,11 @@ func DeclareAndBind(
 		log.Fatalf("failed to open channel")
 	}
 
-	q, err := ch.QueueDeclare(queueName, simpleQueueType != 1, simpleQueueType == 1, simpleQueueType == 1, false, amqp.Table{})
+	q, err := ch.QueueDeclare(queueName, simpleQueueType != 1, simpleQueueType == 1, simpleQueueType == 1, false, amqp.Table{"x-dead-letter-exchange": "peril_dlx"})
 	if err != nil {
 		return nil, amqp.Queue{}, err
 	}
-	err = ch.QueueBind(queueName, key, exchange, false, amqp.Table{})
+	err = ch.QueueBind(queueName, key, exchange, false, amqp.Table{"x-dead-letter-exchange": "peril_dlx"})
 	if err != nil {
 		return nil, amqp.Queue{}, err
 	}
