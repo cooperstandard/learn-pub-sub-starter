@@ -102,16 +102,27 @@ func main() {
 }
 
 
-func handlerPause(gs *gamelogic.GameState) func(routing.PlayingState) {
-	return func(r routing.PlayingState) {
+func handlerPause(gs *gamelogic.GameState) func(routing.PlayingState) string {
+	return func(r routing.PlayingState) string {
 		defer fmt.Print("> ")
 		gs.HandlePause(r)
+		return "Ack"
 	}
 }
 
-func handlerMove(gs *gamelogic.GameState) func(gamelogic.ArmyMove) {
-	return func(move gamelogic.ArmyMove) {
+func handlerMove(gs *gamelogic.GameState) func(gamelogic.ArmyMove) string {
+	return func(move gamelogic.ArmyMove) string {
 		defer fmt.Print("> ")
-		gs.HandleMove(move)
+		moveOutcome := gs.HandleMove(move)
+		switch moveOutcome {
+		case gamelogic.MoveOutcomeSamePlayer:
+			return "NackDiscard"
+		case gamelogic.MoveOutComeSafe:
+			return "Ack"
+		case gamelogic.MoveOutcomeMakeWar:
+			return "Ack"
+		}
+		fmt.Println("error: unknown move outcome")
+		return "NackDiscard"
 	}
 }
