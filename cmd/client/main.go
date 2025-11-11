@@ -148,7 +148,7 @@ func handlerMove(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.ArmyM
 func handlerWar(gs *gamelogic.GameState) func(gamelogic.RecognitionOfWar) pubsub.AckType {
 	return func(rw gamelogic.RecognitionOfWar) pubsub.AckType {
 		defer fmt.Print("> ")
-		outcome, _, _ :=gs.HandleWar(rw)
+		outcome, _, _ := gs.HandleWar(rw)
 		switch outcome {
 		case gamelogic.WarOutcomeNotInvolved:
 			return pubsub.NackRequeue
@@ -157,7 +157,7 @@ func handlerWar(gs *gamelogic.GameState) func(gamelogic.RecognitionOfWar) pubsub
 		case gamelogic.WarOutcomeOpponentWon:
 			return pubsub.Ack
 		case gamelogic.WarOutcomeYouWon:
-					return pubsub.Ack
+			return pubsub.Ack
 		case gamelogic.WarOutcomeDraw:
 			return pubsub.Ack
 		default:
