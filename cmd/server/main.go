@@ -34,6 +34,8 @@ func main() {
 		log.Fatalf("failed to create log queue")
 	}
 
+
+
 	gamelogic.PrintServerHelp()
 
 	for {
