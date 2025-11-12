@@ -28,13 +28,19 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to open channel")
 	}
-	_, _, err = pubsub.DeclareAndBind(connection, "peril_topic", "game_logs", routing.GameLogSlug+".*", 0)
+
+	err = pubsub.SubscribeGOB(
+		connection,
+		routing.ExchangePerilTopic,
+		routing.GameLogSlug,
+		routing.GameLogSlug+".*",
+		pubsub.QueueDurable,
+		pubsub.HandlerLog(),
+	)
+
 	if err != nil {
-		log.Println(err)
-		log.Fatalf("failed to create log queue")
+		log.Fatalf("failed to subscribe to log queue")
 	}
-
-
 
 	gamelogic.PrintServerHelp()
 

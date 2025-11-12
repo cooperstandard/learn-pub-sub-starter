@@ -40,6 +40,17 @@ func HandlerMove(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.ArmyM
 	}
 }
 
+func HandlerLog() func(routing.GameLog) AckType {
+	return func(gl routing.GameLog) AckType {
+		defer fmt.Println("> ")
+		err := gamelogic.WriteLog(gl)
+		if err != nil {
+			return NackRequeue
+		}
+		return Ack
+	}
+}
+
 func HandlerWar(gs *gamelogic.GameState, ch *amqp.Channel) func(gamelogic.RecognitionOfWar) AckType {
 	return func(rw gamelogic.RecognitionOfWar) AckType {
 		defer fmt.Print("> ")
