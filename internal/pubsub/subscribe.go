@@ -32,6 +32,7 @@ func subscribe[T any](
 		return err
 	}
 
+	c.Qos(10, 1, false)
 	receiveCh, err := c.Consume(queueName, "", false, false, false, false, nil)
 	if err != nil {
 		return err

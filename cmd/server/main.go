@@ -37,8 +37,8 @@ func main() {
 		pubsub.QueueDurable,
 		pubsub.HandlerLog(),
 	)
-
 	if err != nil {
+		log.Println(err)
 		log.Fatalf("failed to subscribe to log queue")
 	}
 
